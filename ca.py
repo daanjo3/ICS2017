@@ -1,8 +1,5 @@
-"""
-Author: Daan Meijers
-Student-ID: 10727167
-Assignment: CA3 - Langton Parameter
-"""
+# Daan Meijers, 10727167
+# Steven Raaijmakers, 10804242
 
 from __future__ import division
 import numpy as np
@@ -31,7 +28,7 @@ class CASim(Model):
         self.make_param('p_mosquito_human', 1.0)
         self.make_param('p_human_mosquito', 1.0)
 
-        self.make_param('prevention', 0.0) # TODO
+        self.make_param('prevention', 0.0) # TODO: make prevention
         self.make_param('width', 100)
         self.make_param('height', 100)
 
@@ -170,6 +167,9 @@ if __name__ == '__main__':
     }
 
     n = 10
+    ls = 5
+
+    # TODO: choose ranges
 
     # try n times random shit
     for i in range(0, n):
@@ -181,4 +181,4 @@ if __name__ == '__main__':
         sim.set_params(parameters)
         prevalences = sim.run(t=1000)
 
-        print prevalences
+        print "avg prevalence of last " + str(n) + " items: " + str(sum(prevalences[-ls:]) / ls)
