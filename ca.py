@@ -100,18 +100,24 @@ class CASim(Model):
 
         # print "-UPDATE-"
         if self.t % 100 == 0:
-            healthy = 0
-            sick = 0
-            for i in range(3):
-                xnew, _ = np.where(self.config.state==i+1)
-                if i+1 != 2: healthy += xnew.size
-                else: sick += xnew.size
-            print "T:" + str(self.t)
-            print "Healthy: " + str(healthy)
-            print "Sick: " + str(sick)
-            print "Prevalence: " + str(sick/float(healthy+sick)*100.0)
-            print "---"
+            self.print_update()
+
         self.t += 1
+
+    def print_update(self):
+        healthy = 0
+        sick = 0
+        for i in range(3):
+            xnew, _ = np.where(self.config.state==i+1)
+            if i+1 != 2:
+                healthy += xnew.size
+            else:
+                sick += xnew.size
+        print "T:" + str(self.t)
+        print "Healthy: " + str(healthy)
+        print "Sick: " + str(sick)
+        print "Prevalence: " + str(sick/float(healthy+sick)*100.0)
+        print "---"
 
     def set_params(self, dict):
         self.humans = dict["humans"]
@@ -124,13 +130,11 @@ class CASim(Model):
     def run(self, t=1000):
         self.reset()
         print "INITIAL CONDITIONS:"
-        print "Humans: " + str(self.humans) + ", Mosquitos: " + str(self.mosquitos)
+        print "Humans: " + str(self.humans) + " (of " + str(self.width * self.height) + "), Mosquitos: " + str(self.mosquitos)
         print "M_infected:" + str(self.m_infected) + ", P_mosquito_human: " + str(self.p_mosquito_human) +\
               ", P_human_mosquito: " + str(self.p_human_mosquito) + "\n"
         for i in range(t):
             self.step()
-
-
 
 if __name__ == '__main__':
     sim = CASim()
@@ -138,7 +142,7 @@ if __name__ == '__main__':
     # all initial
     parameters = {
         # percentage of human on field
-        "humans": 0.6,
+        "humans": 0.5,
         # percentage of mosquitos on field
         "mosquitos": 1.2,
         # percentage of infected mosquites
