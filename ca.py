@@ -4,6 +4,7 @@ Student-ID: 10727167
 Assignment: CA3 - Langton Parameter
 """
 
+from __future__ import division
 import numpy as np
 import random
 from classes import Humans, Mosquito
@@ -16,6 +17,12 @@ class CASim(Model):
         self.t = 0
         self.config = None
         self.mosq = []
+
+        #
+        self.healthy = 0
+        self.sick = 0
+        self.prevalence = 0
+        self.prevalences = []
 
         self.make_param('humans', 0.6)
         self.make_param('mosquitos', 1.2)
@@ -100,11 +107,12 @@ class CASim(Model):
 
         # print "-UPDATE-"
         if self.t % 100 == 0:
+            self.update_stats()
             self.print_update()
 
         self.t += 1
 
-    def print_update(self):
+    def update_stats(self):
         healthy = 0
         sick = 0
         for i in range(3):
@@ -113,10 +121,16 @@ class CASim(Model):
                 healthy += xnew.size
             else:
                 sick += xnew.size
+        self.healthy = healthy
+        self.sick = sick
+        self.prevalence = sick / (healthy + sick) * 100.0
+        self.prevalences.append(self.prevalence)
+
+    def print_update(self):
         print "T:" + str(self.t)
-        print "Healthy: " + str(healthy)
-        print "Sick: " + str(sick)
-        print "Prevalence: " + str(sick/float(healthy+sick)*100.0)
+        print "Healthy: " + str(self.healthy)
+        print "Sick: " + str(self.sick)
+        print "Prevalence: " + str(self.prevalence)
         print "---"
 
     def set_params(self, dict):
@@ -136,10 +150,11 @@ class CASim(Model):
         for i in range(t):
             self.step()
 
+        return self.prevalences
+
 if __name__ == '__main__':
     sim = CASim()
 
-    # all initial
     parameters = {
         # percentage of human on field
         "humans": 0.5,
@@ -154,5 +169,16 @@ if __name__ == '__main__':
         "p_human_mosquito": 1.0,
     }
 
-    sim.set_params(parameters)
-    sim.run()
+    n = 10
+
+    # try n times random shit
+    for i in range(0, n):
+        parameters["humans"] = np.random.uniform(0, 1)
+        parameters["mosquitos"] = np.random.uniform(0, 1)
+        parameters["m_infected"] = np.random.uniform(0, 1)
+        parameters["p_mosquito_human"] = np.random.uniform(0, 1)
+        parameters["p_human_human"] = np.random.uniform(0, 1)
+        sim.set_params(parameters)
+        prevalences = sim.run(t=1000)
+
+        print prevalences
