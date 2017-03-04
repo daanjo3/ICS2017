@@ -1,9 +1,12 @@
 import random
 import numpy as np
 
+# Class to contain all information about humans
 class Humans():
+    # ttl = countdown after infected
     state, ttl, age = None, None, None
     width, height = 0, 0
+    death, births = 0, 0
 
     def __init__(self, width, height):
         self.width = width
@@ -16,34 +19,56 @@ class Humans():
         print "State:\n" + str(self.state)
         print "TTL:\n" + str(self.ttl)
 
+    # Sets the cell to the base values
     def die(self, x, y):
+        # Empties a cell to "kill" it
         self.state[x, y] = 0
         self.ttl[x, y] = 0
         self.age[x, y] = 0
-        xnew = random.randint(self.width)
-        ynew = random.randint(self.height)
-        self.birth(xnew, ynew)
 
+        # Selects a random empty cell to place a human
+        xnew, ynew = np.where(self.state == 0)
+        i = random.randint(0, xnew.size-1)
+        self.birth(xnew[i], ynew[i])
+
+    # Places a new human on the grid
     def birth(self, x, y):
         self.state[x, y] = 1
         self.ttl[x, y] = 14
-        self.age[x, y] = 29200
+        self.age[x, y] = 200
 
+    # Fill the grid with humans in state 1
     def build(self, humans):
         for x in range(self.width):
             for y in range(self.height):
                 if random.random() < humans:
-                    self.birth(x, y)
+                    self.state[x, y] = 1
+                    self.ttl[x, y] = 14
+                    self.age[x, y] = random.randint(0, 200)
 
-    def get(self, x, y, l):
-        if l == 0: return state[x, y]
-        if l == 1: return ttl[x, y]
-        if l == 2: return age[x, y]
+    def update(self):
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.state[x, y] > 0:
+                    self.age[x, y] -= 1
 
-    def set(self, x, y, n, l):
-        if l == 0: state[x, y] = n
-        if l == 1: ttl[x, y] = n
-        if l == 2: age[x, y] = n
+                    # If infected the incubation timer counts down
+                    if self.state[x, y] == 2:
+                        self.ttl[x, y] -= 1
+
+                    # Incubation period of malaria is over
+                    if self.ttl[x, y] <= 0:
+                        # Chance on surviving the disease
+                        if random.random() < 0.1:
+                            self.ttl[x, y] = 14
+                            self.state[x, y] = 3
+                        # Human dies of malaria
+                        else:
+                            self.die(x, y)
+
+                    # Human dies of old age
+                    if self.age[x, y] <= 0 and self.state[x, y] > 0:
+                        self.die(x, y)
 
 class Mosquito():
     # Locatie
@@ -52,10 +77,25 @@ class Mosquito():
     hunger = 0
     # Infected boolean
     infected = 0
+    width = 0
+    height = 0
 
     def __init__(self, width, height, infected):
-        x = random.randint(0, width)
-        y = random.randint(0, height)
-        self.coordinate = [x, y]
-        if random.random() < infected: self.infected = 1
+        self.width = width
+        self.height = height
+        self.infected = infected
+        x = random.randint(0, width-1)
+        y = random.randint(0, height-1)
+        self.coordinate = (x, y)
         self.hunger = random.randint(0, 7)
+
+    def walk(self):
+        if self.hunger > 0:
+            self.hunger -= 1
+        x, y = self.coordinate
+        while(True):
+            nx = x + random.randint(-1, 1)
+            ny = y + random.randint(-1, 1)
+            if nx >= 0 and ny >= 0 and nx < self.width and ny < self.height:
+                self.coordinate = [nx, ny]
+                return
