@@ -123,7 +123,10 @@ class CASim(Model):
 
     def run(self, t=1000):
         self.reset()
-        print "Humans: " + str(self.humans) + ", Mosquitos: " + str(self.mosquitos) + "\n"
+        print "INITIAL CONDITIONS:"
+        print "Humans: " + str(self.humans) + ", Mosquitos: " + str(self.mosquitos)
+        print "M_infected:" + str(self.m_infected) + ", P_mosquito_human: " + str(self.p_mosquito_human) +\
+              ", P_human_mosquito: " + str(self.p_human_mosquito) + "\n"
         for i in range(t):
             self.step()
 
@@ -143,7 +146,7 @@ if __name__ == '__main__':
 
         # probability of mosquito getting infected by human with malaria
         "p_mosquito_human": 1.0,
-        # probabilit of human getting infected by mosquito with malaria
+        # probability of human getting infected by mosquito with malaria
         "p_human_mosquito": 1.0,
     }
 
