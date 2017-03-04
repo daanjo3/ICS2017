@@ -18,10 +18,13 @@ class CASim(Model):
         self.mosq = []
 
         self.make_param('humans', 0.6)
-        # The table parameter can be used to set the rule set generation method.
         self.make_param('mosquitos', 1.2)
+
         self.make_param('m_infected', 0.5)
-        self.make_param('prevention', 0.0)
+        self.make_param('p_mosquito_human', 1.0)
+        self.make_param('p_human_mosquito', 1.0)
+
+        self.make_param('prevention', 0.0) # TODO
         self.make_param('width', 100)
         self.make_param('height', 100)
 
@@ -83,15 +86,19 @@ class CASim(Model):
                 m.hunger = 7
                 if state == 1 and m.infected == 1:
                     # Chance of getting infected after 1 bite
-                    if random.random() < 0.3:
+                    if random.random() < self.p_human_mosquito:
                         self.config.state[x, y] = 2
                     else:
                         self.config.state[x, y] = 1
                 if state == 2 and m.infected == 0:
-                    m.infected = 1
+                    if random.random() < self.p_mosquito_human:
+                        m.infected = 1
+                    else:
+                        m.infected = 0
+
+        self.config.update()
 
         # print "-UPDATE-"
-        self.config.update()
         if self.t % 100 == 0:
             healthy = 0
             sick = 0
@@ -99,15 +106,46 @@ class CASim(Model):
                 xnew, _ = np.where(self.config.state==i+1)
                 if i+1 != 2: healthy += xnew.size
                 else: sick += xnew.size
+            print "T:" + str(self.t)
             print "Healthy: " + str(healthy)
             print "Sick: " + str(sick)
             print "Prevalence: " + str(sick/float(healthy+sick)*100.0)
+            print "---"
         self.t += 1
+
+    def set_params(self, dict):
+        self.humans = dict["humans"]
+        self.mosquitos = dict["mosquitos"]
+        self.m_infected = dict["m_infected"]
+
+        self.p_mosquito_human = dict["p_mosquito_human"]
+        self.p_human_mosquito = dict["p_human_mosquito"]
+
+    def run(self, t=1000):
+        self.reset()
+        print "Humans: " + str(self.humans) + ", Mosquitos: " + str(self.mosquitos) + "\n"
+        for i in range(t):
+            self.step()
 
 
 
 if __name__ == '__main__':
     sim = CASim()
-    from pyics import GUI
-    cx = GUI(sim)
-    cx.start()
+
+    # all initial
+    parameters = {
+        # percentage of human on field
+        "humans": 0.6,
+        # percentage of mosquitos on field
+        "mosquitos": 1.2,
+        # percentage of infected mosquites
+        "m_infected": 0.5,
+
+        # probability of mosquito getting infected by human with malaria
+        "p_mosquito_human": 1.0,
+        # probabilit of human getting infected by mosquito with malaria
+        "p_human_mosquito": 1.0,
+    }
+
+    sim.set_params(parameters)
+    sim.run()
