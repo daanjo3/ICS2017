@@ -91,7 +91,9 @@ class CASim(Model):
                 if state == 1 and m.infected == 1:
                     # Chance of getting infected after 1 bite
                     if random.random() < self.p_human_mosquito:
-                        self.config.state[x, y] = 2
+                        # has net
+                        if random.random() > self.prevention:
+                            self.config.state[x, y] = 2
                     else:
                         self.config.state[x, y] = 1
                 if state == 2 and m.infected == 0:
@@ -137,6 +139,7 @@ class CASim(Model):
 
         self.p_mosquito_human = dict["p_mosquito_human"]
         self.p_human_mosquito = dict["p_human_mosquito"]
+        self.has_mosquito_net = dict["has_mosquito_net"]
 
     def run(self, t=1000):
         self.reset()
@@ -160,6 +163,8 @@ if __name__ == '__main__':
         # percentage of infected mosquites
         "m_infected": 0.5,
 
+        "has_mosquito_net": 1.0,
+
         # probability of mosquito getting infected by human with malaria
         "p_mosquito_human": 1.0,
         # probability of human getting infected by mosquito with malaria
@@ -178,6 +183,7 @@ if __name__ == '__main__':
         parameters["m_infected"] = np.random.uniform(0, 1)
         parameters["p_mosquito_human"] = np.random.uniform(0, 1)
         parameters["p_human_human"] = np.random.uniform(0, 1)
+        parameters["has_mosquito_net"] = 1.0
         sim.set_params(parameters)
         prevalences = sim.run(t=1000)
 
