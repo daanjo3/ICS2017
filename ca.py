@@ -1,8 +1,7 @@
-"""
-Author: Daan Meijers
-Student-ID: 10727167
-Assignment: CA3 - Langton Parameter
-"""
+# Daan Meijers 10727167 & Steven Raaijmakers 10804242
+
+# Program simulates malaria spread based on some parameters
+
 from __future__ import division
 import numpy as np
 import random
@@ -27,13 +26,12 @@ class CASim(Model):
 
         #
         self.make_param('humans', 0.7)
-        self.make_param('mosquitos', 1.2)
-
-        self.make_param('m_infected', 0.5)
-        self.make_param('p_mosquito_human', 1.0)
-        self.make_param('p_human_mosquito', 1.0)
-
+        self.make_param('mosquitos', 0.7)
+        self.make_param('m_infected', 0.6)
+        self.make_param('p_mosquito_human', 0.3)
+        self.make_param('p_human_mosquito', 0.9)
         self.make_param('prevention', 0.0)
+
         self.make_param('width', 100)
         self.make_param('height', 100)
 
@@ -168,7 +166,9 @@ class CASim(Model):
 
 if __name__ == '__main__':
     sim = CASim()
-
+    from pyics import GUI
+    cx = GUI(sim)
+    cx.start()
 
     parameters = {
         # percentage of human on field
@@ -230,6 +230,3 @@ if __name__ == '__main__':
     plt.xlabel('Days')
     plt.legend()
     plt.show()
-    # from pyics import GUI
-    # cx = GUI(sim)
-    # cx.start()
