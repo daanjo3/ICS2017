@@ -65,7 +65,7 @@ if __name__ == '__main__':
             label_1 = "Mosquito infected by human 30%"
             label_2 = "Mosquito infected by human 0%"
         elif argument == 'prevention':
-            parameters["prevention"] = 0.5
+            parameters["has_mosquito_net"] = 0.5
             sim.set_params(parameters)
 
             v2_h, v2_s = sim.run()
