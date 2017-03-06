@@ -37,10 +37,7 @@ class Humans():
     def birth(self, x, y):
         self.state[x, y] = 1
         self.ttl[x, y] = 14
-        if random.random() < 0.4:
-            self.age[x, y] = random.randint(0, 365 * 15)
-        else:
-            self.age[x, y] = random.randint(365 * 15, 365 * MAX_AGE)
+        self.age[x, y] = 365 * MAX_AGE
 
     # Fill the grid with humans in state 1
     def build(self, humans):
@@ -50,7 +47,7 @@ class Humans():
                     self.state[x, y] = 1
                     self.ttl[x, y] = 14
 
-                    if random.random() < 1.0:
+                    if random.random() < 0.4:
                         self.age[x, y] = random.randint(0, 365 * 15)
                     else:
                         self.age[x, y] = random.randint(365 * 15, 365 * MAX_AGE)
@@ -68,7 +65,7 @@ class Humans():
                     # Incubation period of malaria is over
                     if self.ttl[x, y] <= 0:
                         # Chance on surviving the disease
-                        if random.random() < 0.01:
+                        if random.random() < 0.1:
                             self.ttl[x, y] = 14
                             self.state[x, y] = 3
                         # Human dies of malaria
